@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import Colourpalete from './Componenets/Colourpallete'
 import './App.css'
+
 
 function App() {
   let [counter, setCounter] = useState(5);
@@ -22,11 +24,12 @@ function App() {
 
   return (
     <>
-      <h1>Myself Imagine</h1>
+      <h1 className='bg-green-100'>Myself Imagine</h1>
       <h2>Counter: {counter}</h2>
       <button onClick={addvalue}>Add Value</button><br/>
       <button onClick={removevalue}>Remove Value</button><br/>
-      <input  type = 'number' onChange={customvalue}></input>
+      <input  type = 'number' onChange={customvalue}></input><br /><br />
+      <Colourpalete />
     </>
   )
 }
