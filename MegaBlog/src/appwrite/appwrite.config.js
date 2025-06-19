@@ -115,6 +115,10 @@ export class Service {
          return false;
       }
    }
+
+   async getFilePreview(featuredImage){
+      return this.bucket.getFilePreview(config.appwriteBucket_ID, featuredImage)
+   }
    
 
 

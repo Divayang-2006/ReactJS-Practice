@@ -2,40 +2,40 @@ import React, { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Input, Select, RTE } from './index'
 import appwriteService from '../appwrite/appwrite.config'
-import { Navigate, useNavigate } from 'react-router-dom'
+import {  useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 function PostForm({ post }) {
 
-   const { register, handleSubmit, watch, setValue, control } = useForm({
+   const { register, handleSubmit, watch, setValue, getValues, control } = useForm({
       defaultValues: {
          title: post?.title || '',
          slug: post?.slug || '',
          content: post?.content || '',
-         status: post?.status || 'active'
+         status: post?.status || true
       }
    })
 
    const navigate = useNavigate()
-   const userData = useSelector(state => state.user.userData)
+   const userData = useSelector((state) => state.auth?.userData)
+   console.log(userData)
 
    const submit = async (data) => {
       if (post) {
-         const file = data.image[0] ? appwriteService
+         const file = data.image[0] ? await appwriteService
             .uploadFile(data.image[0]) : null
 
          if (file) {
             appwriteService.deleteFile(post.featuredImage);
          }
 
-         const dbPost = await appwriteService.updatePost
-            (post.$id, {
-               ...data,
-               featuredImage: file ? file.$id : undefined,
-               if(dbPost) {
-                  navigate(`/post/${dbPost.$id}`)
-               }
-            })
+         const dbPost = await appwriteService.updatePost(post.$id, {
+            ...data,
+            featuredImage: file ? file.$id : post.featuredImage,
+         });
+         if (dbPost) {
+            navigate(`/post/${dbPost.$id}`);
+         }
       } else {
          const file = await appwriteService.uploadFile(data.image[0]);
          if (file) {
@@ -57,10 +57,10 @@ function PostForm({ post }) {
          return value
             .trim()
             .toLowerCase()
-            .replace(/^[a-zA-Z\d\s]+/g, '-')
-            .replace(/\s/g, '-')
+            .replace(/\s+/g, '-')     // Replace spaces with dashes
+            .replace(/[^a-z0-9\-]/g, '') // Remove non-alphanumeric except dashes
       } else return ''
-   }, [watch, slugTransform, setValue])
+   }, [watch, setValue])
 
    React.useEffect(() => {
       const subscription = watch((value, { name }) => {
@@ -104,7 +104,7 @@ function PostForm({ post }) {
             {post && (
                <div className="w-full mb-4">
                   <img
-                     src={appwriteService.getFilePreview(post.featuredImage)}
+                     src={appwriteService.getFilePreview(post.featuredImage).href}
                      alt={post.title}
                      className="rounded-lg"
                   />
@@ -116,7 +116,7 @@ function PostForm({ post }) {
                className="mb-4"
                {...register("status", { required: true })}
             />
-            <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
+            <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full hover:bg-green-900">
                {post ? "Update" : "Submit"}
             </Button>
          </div>
