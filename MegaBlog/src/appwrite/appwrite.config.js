@@ -116,7 +116,7 @@ export class Service {
       }
    }
 
-   async getFilePreview(featuredImage){
+   getFilepreview(featuredImage){
       return this.bucket.getFilePreview(config.appwriteBucket_ID, featuredImage)
    }
    
